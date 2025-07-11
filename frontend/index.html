@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilaDB - 3D Printing Asset Management</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>FilaDB</h1>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="#dashboard" class="nav-link active" data-page="dashboard">Dashboard</a>
+                <a href="#files" class="nav-link" data-page="files">Files</a>
+                <a href="#inventory" class="nav-link" data-page="inventory">Inventory</a>
+                <a href="#admin" class="nav-link" data-page="admin" id="admin-link" style="display: none;">Admin</a>
+            </div>
+            <div class="nav-user">
+                <span id="user-email"></span>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Login Form -->
+        <div id="login-container" class="login-container">
+            <div class="login-form">
+                <h2>Login to FilaDB</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div id="login-error" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content" style="display: none;">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <h2>Dashboard</h2>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total Files</h3>
+                        <span id="total-files">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Spools</h3>
+                        <span id="total-spools">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Filament Types</h3>
+                        <span id="total-filaments">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Page -->
+            <div id="files-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Files</h2>
+                    <button id="upload-file-btn" class="btn btn-primary">Upload File</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="file-search" placeholder="Search files...">
+                </div>
+                <div id="file-list" class="file-list"></div>
+            </div>
+
+            <!-- Inventory Page -->
+            <div id="inventory-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Inventory</h2>
+                    <div class="btn-group">
+                        <button id="add-filament-btn" class="btn btn-primary">Add Filament</button>
+                        <button id="add-spool-btn" class="btn btn-secondary">Add Spool</button>
+                    </div>
+                </div>
+                <div class="inventory-tabs">
+                    <button class="tab-btn active" data-tab="filaments">Filaments</button>
+                    <button class="tab-btn" data-tab="spools">Spools</button>
+                </div>
+                <div id="filaments-tab" class="tab-content">
+                    <div class="search-bar">
+                        <input type="text" id="filament-search" placeholder="Search filaments...">
+                    </div>
+                    <div id="filament-list" class="filament-list"></div>
+                </div>
+                <div id="spools-tab" class="tab-content" style="display: none;">
+                    <div id="spool-list" class="spool-list"></div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="admin-page" class="page" style="display: none;">
+                <h2>Admin</h2>
+                <div class="admin-section">
+                    <h3>SpoolmanDB Sync</h3>
+                    <button id="sync-spoolmandb-btn" class="btn btn-primary">Sync SpoolmanDB</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Users</h3>
+                    <div id="user-list"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <div id="upload-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Upload File</h3>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file-input">File:</label>
+                        <input type="file" id="file-input" name="file" accept=".stl,.3mf,.gcode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="file-name">Name:</label>
+                        <input type="text" id="file-name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="file-description">Description:</label>
+                        <textarea id="file-description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="file-tags-input">Tags (comma-separated):</label>
+                        <input type="text" id="file-tags-input" name="tags">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="filament-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Add Custom Filament</h3>
+                <form id="filament-form">
+                    <div class="form-group">
+                        <label for="filament-manufacturer-input">Manufacturer:</label>
+                        <input type="text" id="filament-manufacturer-input" name="manufacturer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-name-input">Name:</label>
+                        <input type="text" id="filament-name-input" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-material-input">Material:</label>
+                        <input type="text" id="filament-material-input" name="material" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-density-input">Density (g/cm³):</label>
+                        <input type="number" id="filament-density-input" name="density" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-weight-input">Weight (g):</label>
+                        <input type="number" id="filament-weight-input" name="weight_g" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-diameter-input">Diameter (mm):</label>
+                        <input type="number" id="filament-diameter-input" name="diameter_mm" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-color-name-input">Color Name:</label>
+                        <input type="text" id="filament-color-name-input" name="color_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filament-color-hex-input">Color Hex:</label>
+                        <input type="color" id="filament-color-hex-input" name="color_hex" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Filament</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="spool-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Add Spool</h3>
+                <form id="spool-form">
+                    <div class="form-group">
+                        <label for="spool-filament-select">Filament:</label>
+                        <select id="spool-filament-select" name="filament_id" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="spool-weight-input">Remaining Weight (g):</label>
+                        <input type="number" id="spool-weight-input" name="remaining_weight_g" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="spool-location-input">Location:</label>
+                        <input type="text" id="spool-location-input" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label for="spool-lot-input">Lot Number:</label>
+                        <input type="text" id="spool-lot-input" name="lot_number">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Spool</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/services/api.js"></script>
+    <script src="js/components/Auth.js"></script>
+    <script src="js/components/Dashboard.js"></script>
+    <script src="js/components/Files.js"></script>
+    <script src="js/components/Inventory.js"></script>
+    <script src="js/components/Admin.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+                    </div>
