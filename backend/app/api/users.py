@@ -6,7 +6,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from uuid import UUID
 
 from ..database import get_db
@@ -18,7 +18,7 @@ router = APIRouter()
 
 class UserBase(BaseModel):
     username: str
-    email: EmailStr
+    email: str
     role: UserRole = UserRole.USER
     is_active: bool = True
 
@@ -29,7 +29,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     username: str | None = None
-    email: EmailStr | None = None
+    email: str | None = None
     role: UserRole | None = None
     is_active: bool | None = None
 
