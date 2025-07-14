@@ -33,7 +33,7 @@ class PrintJob(Base):
     filament_used = Column(DECIMAL(8, 2))  # Filament used in grams
     status = Column(Enum(PrintJobStatus), default=PrintJobStatus.QUEUED, nullable=False)
     notes = Column(Text)
-    metadata = Column(JSONB, default={})
+    job_metadata = Column(JSONB, default={})
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
